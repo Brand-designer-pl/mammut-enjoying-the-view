@@ -8,16 +8,16 @@ const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isInte
 document.addEventListener('focusin',e=>{for(let node=e.target;node&&node!==document.body;node=node.parentElement)if(node.classList.contains('reveal'))node.classList.add('visible')});
 
 // Native carousel: one-card navigation, responsive sizing and no autoplay.
-const track=document.querySelector('.inspiration-track');
-if(track){
-  const cards=[...track.querySelectorAll('.inspiration-card')],prev=document.querySelector('.carousel-prev'),next=document.querySelector('.carousel-next'),count=document.querySelector('.carousel-count');
+document.querySelectorAll('[data-carousel]').forEach(carousel=>{
+  const track=carousel.querySelector('.inspiration-track'),unit=carousel.dataset.unit;
+  const cards=[...track.querySelectorAll('.inspiration-card')],prev=carousel.querySelector('.carousel-prev'),next=carousel.querySelector('.carousel-next'),count=carousel.querySelector('.carousel-count');
   let carouselTimer;
   const step=()=>cards[0].getBoundingClientRect().width+parseFloat(getComputedStyle(track).gap);
   function updateCarousel(){
     const left=track.scrollLeft,max=track.scrollWidth-track.clientWidth;
     prev.disabled=left<2;next.disabled=left>=max-2;
     const first=Math.min(cards.length,Math.floor((left+2)/step())+1),last=Math.min(cards.length,Math.ceil((left+track.clientWidth-2)/step()));
-    count.textContent=first===last?`${String(first).padStart(2,'0')} / ${cards.length} rolek`:`${String(first).padStart(2,'0')}–${String(last).padStart(2,'0')} / ${cards.length} rolek`;
+    count.textContent=first===last?`${String(first).padStart(2,'0')} / ${cards.length} ${unit}`:`${String(first).padStart(2,'0')}–${String(last).padStart(2,'0')} / ${cards.length} ${unit}`;
   }
   function advance(direction){
     const current=Math.round(track.scrollLeft/step());
@@ -27,4 +27,4 @@ if(track){
   track.addEventListener('keydown',e=>{if(e.target!==track)return;if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();advance(e.key==='ArrowRight'?1:-1)}});
   track.addEventListener('scroll',()=>{clearTimeout(carouselTimer);carouselTimer=setTimeout(updateCarousel,100)},{passive:true});
   new ResizeObserver(updateCarousel).observe(track);updateCarousel();
-}
+});
