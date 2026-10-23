@@ -1,0 +1,23 @@
+name: Deploy to LH /view/
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'style.css', 'app.js', 'assets/**', 'scripts/deploy_lh.py', '.github/workflows/deploy-lh.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy-lh-view
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: lh-view
+    steps:
+      - uses: actions/checkout@v4
+      - name: Upload website over verified FTPS
+        env:
+          FTP_HOST: ${{ secrets.LH_FTP_HOST }}
+          FTP_USER: ${{ secrets.LH_FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.LH_FTP_PASSWORD }}
+        run: python3 scripts/deploy_lh.py
